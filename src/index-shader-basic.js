@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import basicVetex from "./asset/glsl/raw/vetex.glsl";
-import basicFragment from "./asset/glsl/raw/fragment.glsl";
-import { Clock } from "three";
+import basicVetex from "./asset/glsl/basic/vetex.glsl";
+import basicFragment from "./asset/glsl/basic/fragment.glsl";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -22,26 +21,15 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 renderer.physicallyCorrectLights = true;
 
-let textloader = new THREE.TextureLoader();
-let img = textloader.load("./assets/ca.jpeg");
-
 // 内容区
-let planeGeometry = new THREE.PlaneGeometry(20, 20, 64, 64);
-let material = new THREE.RawShaderMaterial({
+let planeGeometry = new THREE.PlaneGeometry(10, 10, 64, 64);
+let material = new THREE.ShaderMaterial({
+  side: THREE.DoubleSide,
   vertexShader: basicVetex,
   fragmentShader: basicFragment,
-  uniforms: {
-    uTime: {
-      value: 0,
-    },
-    uTexture: {
-      value: img,
-    },
-  },
 });
 
 let plane = new THREE.Mesh(planeGeometry, material);
-// plane.rotation.x = -Math.PI / 2;
 scene.add(plane);
 
 // 坐标轴辅助线
@@ -53,12 +41,8 @@ let controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 // 禁止放大缩小
 controls.enableZoom = false;
-
-let clock = new Clock();
-
 function render() {
   controls.update();
-  material.uniforms.uTime.value = clock.getElapsedTime();
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 }
